@@ -60,5 +60,5 @@ jobs:
             sleep 1
           done
           
-      - name: Executacao dos testes
+      - name: Execução dos testes
         run: npm run test:prova
