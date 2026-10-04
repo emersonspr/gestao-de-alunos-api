@@ -1,32 +1,48 @@
-import { api } from './api.js';
+import { api } from './api.js'
 import 'dotenv/config';
 
 let tokenEmCache = null
 
 export async function comTokenDeAdmin() {
-    if (!tokenEmCache) {
-        const loginResposta = await api()
-            .post('/api/auth/login')
-            .set('Content-Type', 'application/json')
-            .send({ 
-                    email: process.env.ADMIN_EMAIL, 
-                    senha: process.env.ADMIN_SENHA
+    if(!tokenEmCache) {
+        const loginResposta = await api ()
+        .post('/api/auth/login')
+        .set('Content-Type', 'application/json')
+        .send({
+                email: process.env.ADMIN_EMAIL,
+                senha: process.env.ADMIN_SENHA
             });
-        
+
         tokenEmCache = loginResposta.body.token;
     }
+    
 
     return `Bearer ${tokenEmCache}`;
 }
 
 export async function getToken(emailUser, passUser) {
-    const loginResposta = await api()
+    const loginResposta = await api ()
         .post('/api/auth/login')
         .set('Content-Type', 'application/json')
         .send({ 
-            email: emailUser, 
-            senha: passUser
+            'email': emailUser,
+            'senha': passUser 
         });
 
     return loginResposta.body.token;
 }
+
+export async function comTokenDeAluno(emailUser, passUser) {
+    const loginResposta = await api()
+        .post('/api/auth/login')
+        .set('Content-Type', 'application/json')
+        .send({
+            email: emailUser,
+            senha: passUser
+        });
+
+    return `Bearer ${loginResposta.body.token}`;
+}
+
+
+

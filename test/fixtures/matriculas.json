@@ -1,0 +1,17 @@
+[
+    {
+        "testTitle": "Validacao aluno já cadastrado pode ser matriculado em uma nova disciplina",
+        "dadosAluno": {
+            "nome": "Herculino Teste",
+            "email": "herculino@teste.com",
+            "matricula": "12345678",
+            "senha": "123456"
+        },
+        "dadosDisciplina": {
+            "nome": "Pensamento Computacional",
+            "codigo": "PC0124",
+            "cargaHoraria": 60
+        },
+        "statusCodeEsperado": 201
+    }
+]
