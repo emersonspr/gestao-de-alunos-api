@@ -1,0 +1,64 @@
+name: Testes de API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    
+  schedule:
+    - cron: '10 22 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/gestao-de-alunos-test
+      BASE_URL: http://127.0.0.1:3000
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_SENHA: ${{ secrets.ADMIN_SENHA }}
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Iniciar API
+        run: |
+          npm start > server.log 2>&1 &
+          for tentativa in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+            echo "API disponível."
+              break
+            fi
+
+            if [ "$tentativa" -eq 30 ]; then
+              echo "API não iniciou após 30 segundos."
+              cat server.log
+              exit 1
+            fi
+            
+            sleep 1
+          done
+          
+      - name: Executacao dos testes
+        run: npm run test:prova
